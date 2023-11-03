@@ -28,7 +28,7 @@ public class Lox {
         if (hadError) System.exit(65);
     }
 
-    private static void runPrompt() throws IOEXception {
+    private static void runPrompt() throws IOException {
         InputStreamReader input = new InputStreamReader(System.in);
         BufferedReader reader = new BufferedReader(input);
 
@@ -56,7 +56,7 @@ public class Lox {
 
     private static void report(int line, String where, String msg) {
         System.err.println(
-                "[line " + line "] Error " + where + ": " + msg
+                "[line " + line + "] Error " + where + ": " + msg
         );
         hadError = true;
     }
