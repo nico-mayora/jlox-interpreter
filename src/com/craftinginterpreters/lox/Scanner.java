@@ -18,22 +18,22 @@ class Scanner {
 
     static {
         keywords = new HashMap<>();
-        keywords.put("and",    AND);
-        keywords.put("class",  CLASS);
-        keywords.put("else",   ELSE);
-        keywords.put("false",  FALSE);
-        keywords.put("for",    FOR);
-        keywords.put("fun",    FUN);
-        keywords.put("if",     IF);
-        keywords.put("nil",    NIL);
-        keywords.put("or",     OR);
-        keywords.put("print",  PRINT);
+        keywords.put("and", AND);
+        keywords.put("class", CLASS);
+        keywords.put("else", ELSE);
+        keywords.put("false", FALSE);
+        keywords.put("for", FOR);
+        keywords.put("fun", FUN);
+        keywords.put("if", IF);
+        keywords.put("nil", NIL);
+        keywords.put("or", OR);
+        keywords.put("print", PRINT);
         keywords.put("return", RETURN);
-        keywords.put("super",  SUPER);
-        keywords.put("this",   THIS);
-        keywords.put("true",   TRUE);
-        keywords.put("var",    VAR);
-        keywords.put("while",  WHILE);
+        keywords.put("super", SUPER);
+        keywords.put("this", THIS);
+        keywords.put("true", TRUE);
+        keywords.put("var", VAR);
+        keywords.put("while", WHILE);
     }
 
     Scanner(String source) {
@@ -54,38 +54,35 @@ class Scanner {
     private void scanToken() {
         char c = advance();
         switch (c) {
-            case '(': addToken(LEFT_PAREN); break;
-            case ')': addToken(RIGHT_PAREN); break;
-            case '{': addToken(LEFT_BRACE); break;
-            case '}': addToken(RIGHT_BRACE); break;
-            case ',': addToken(COMMA); break;
-            case '.': addToken(DOT); break;
-            case '-': addToken(MINUS); break;
-            case '+': addToken(PLUS); break;
-            case ';': addToken(SEMICOLON); break;
-            case '*': addToken(STAR); break;
-            case '!':
-                addToken(match('=') ? BANG_EQUAL : BANG);
-                break;
-            case '=':
-                addToken(match('=') ? EQUAL_EQUAL : EQUAL);
-                break;
-            case '<':
-                addToken(match('=') ? LESS_EQUAL : LESS);
-                break;
-            case '>':
-                addToken(match('=') ? GREATER_EQUAL : GREATER);
-                break;
-            case '/':
+            case '(' -> addToken(LEFT_PAREN);
+            case ')' -> addToken(RIGHT_PAREN);
+            case '{' -> addToken(LEFT_BRACE);
+            case '}' -> addToken(RIGHT_BRACE);
+            case ',' -> addToken(COMMA);
+            case '.' -> addToken(DOT);
+            case '-' -> addToken(MINUS);
+            case '+' -> addToken(PLUS);
+            case ';' -> addToken(SEMICOLON);
+            case '*' -> addToken(STAR);
+            case '!' -> addToken(match('=') ? BANG_EQUAL : BANG);
+            case '=' -> addToken(match('=') ? EQUAL_EQUAL : EQUAL);
+            case '<' -> addToken(match('=') ? LESS_EQUAL : LESS);
+            case '>' -> addToken(match('=') ? GREATER_EQUAL : GREATER);
+            case '/' -> {
                 if (match('/')) {
                     // Comments end at the end of the line
                     while (peek() != '\n' && !isAtEnd()) advance();
                 } else if (match('*')) {
-                    // Ends with a matching */ sequence, at the same level
-
+                    int nesting = 1;
                     for (;;) {
                         if (isAtEnd()) break;
-                        if (match('*') && match('/')) break;
+                        if (peek() == '/' && peekNext() == '*') {
+                            advance(); advance(); nesting++;
+                        }
+                        if (peek() == '*' && peekNext() == '/') {
+                            advance(); advance();
+                            if (--nesting == 0) break;
+                        }
                         if (peek() == '\n') line++;
 
                         advance();
@@ -94,21 +91,13 @@ class Scanner {
                 } else {
                     addToken(SLASH);
                 }
-                break;
-
-            case ' ':
-            case '\t':
-            case '\r':
-                // Ignore
-                break;
-
-            case '\n':
-                line++;
-                break;
-
-            case '"': string(); break;
-
-            default:
+            }
+            case ' ', '\t', '\r' -> {
+            }
+            // Ignore
+            case '\n' -> line++;
+            case '"' -> string();
+            default -> {
                 if (isDigit(c)) {
                     number();
                 } else if (isAlpha(c)) {
@@ -116,7 +105,7 @@ class Scanner {
                 } else {
                     Lox.error(line, "Unexpected character.");
                 }
-                break;
+            }
         }
     }
 
@@ -158,7 +147,7 @@ class Scanner {
         advance();
 
         // Omit surrounding quotes
-        String value = source.substring(start +1 , current - 1);
+        String value = source.substring(start + 1, current - 1);
         addToken(STRING, value);
     }
 
@@ -176,14 +165,14 @@ class Scanner {
     }
 
     private char peekNext() {
-        if (current + 1  >= source.length()) return '\0';
+        if (current + 1 >= source.length()) return '\0';
         return source.charAt(current + 1);
     }
 
     private boolean isAlpha(char c) {
         return (c >= 'a' && c <= 'z') ||
-               (c >= 'A' && c <= 'Z') ||
-               (c == '_');
+                (c >= 'A' && c <= 'Z') ||
+                (c == '_');
     }
 
     private boolean isAlphaNumeric(char c) {
