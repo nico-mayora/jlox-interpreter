@@ -72,10 +72,9 @@ class Scanner {
                 if (match('/')) {
                     // Comments end at the end of the line
                     while (peek() != '\n' && !isAtEnd()) advance();
-                } else if (match('*')) {
+                } else if (match('*')) { // Multiline comment
                     int nesting = 1;
-                    for (;;) {
-                        if (isAtEnd()) break;
+                    while (!isAtEnd()) {
                         if (peek() == '/' && peekNext() == '*') {
                             advance(); advance(); nesting++;
                         }
