@@ -73,10 +73,6 @@ public class Parser {
         return expr;
     }
 
-    /*
-    unary → ( "!" | "-" ) unary
-          | primary ;
-    */
     private Expr unary() {
         if (match(BANG, MINUS)) {
             return new Expr.Unary(previous(), unary());
