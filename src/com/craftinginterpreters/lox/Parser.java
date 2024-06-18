@@ -25,24 +25,30 @@ public class Parser {
         return comma();
     }
 
-    /*
-    expression     → comma ;
-    comma          → equality ( "," equality )* ;
-    equality       → comparison ( ( "!=" | "==" ) comparison )* ;
-     */
-
     private Expr comma() {
-        Expr expr = equality();
+        Expr expr = conditional();
 
         while (match(COMMA)) {
             Token operator = previous();
-            Expr right = equality();
+            Expr right = conditional();
             expr = new Expr.Binary(expr, operator, right);
         }
 
         return expr;
     }
 
+    private Expr conditional() {
+        Expr expr = equality();
+
+        if (match(QUESTION)) {
+            Expr thenBranch = expression();
+            consume(COLON, "Expect ':' after then branch of conditional expression.");
+            Expr elseBranch = conditional();
+            expr = new Expr.Conditional(expr, thenBranch, elseBranch);
+        }
+
+        return expr;
+    }
 
     private Expr equality() {
         Expr expr = comparison();
@@ -113,6 +119,32 @@ public class Parser {
             Expr expr = expression();
             consume(RIGHT_PAREN, "Expect ')' after expression.");
             return new Expr.Grouping(expr);
+        }
+
+        // Error productions
+        String missingOperand = "Missing left-hand operand.";
+        if (match(BANG_EQUAL, EQUAL_EQUAL)) {
+            error(previous(), missingOperand);
+            equality();
+            return null;
+        }
+
+        if (match(GREATER, GREATER_EQUAL, LESS, LESS_EQUAL)) {
+            error(previous(), missingOperand);
+            comparison();
+            return null;
+        }
+
+        if (match(PLUS)) {
+            error(previous(), missingOperand);
+            term();
+            return null;
+        }
+
+        if (match(SLASH, STAR)) {
+            error(previous(), missingOperand);
+            term();
+            return null;
         }
 
         throw error(peek(), "Expect expression.");

@@ -59,6 +59,8 @@ class Scanner {
             case '{' -> addToken(LEFT_BRACE);
             case '}' -> addToken(RIGHT_BRACE);
             case ',' -> addToken(COMMA);
+            case '?' -> addToken(QUESTION);
+            case ':' -> addToken(COLON);
             case '.' -> addToken(DOT);
             case '-' -> addToken(MINUS);
             case '+' -> addToken(PLUS);

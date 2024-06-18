@@ -16,10 +16,11 @@ public class GenerateAst {
         }
         String outputDir = args[0];
         defineAst(outputDir, "Expr", Arrays.asList(
-                "Binary   : Expr left, Token operator, Expr right",
-                "Grouping : Expr expression",
-                "Literal  : Object value",
-                "Unary    : Token operator, Expr right"
+                "Binary      : Expr left, Token operator, Expr right",
+                "Conditional : Expr condition, Expr thenBranch, Expr elseBranch",
+                "Grouping    : Expr expression",
+                "Literal     : Object value",
+                "Unary       : Token operator, Expr right"
         ));
     }
 
@@ -32,7 +33,7 @@ public class GenerateAst {
         writer.println("package com.craftinginterpreters.lox;");
         writer.println();
         writer.println("import java.util.List;");
-        writer.println("abstract class " + baseName + " {");
+        writer.println(STR."abstract class \{baseName} {");
 
         defineVisitor(writer, baseName, types);
 
